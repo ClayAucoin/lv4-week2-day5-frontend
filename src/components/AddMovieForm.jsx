@@ -21,10 +21,10 @@ export default function GameForm() {
     }
     console.log(movie)
     fetch(builtUrl, {
-      method: "POST", // set method
-      body: JSON.stringify(movie), // set body of request (convert JSON to String)
+      method: "POST",
+      body: JSON.stringify(movie),
       headers: {
-        "Content-Type": "application/json", // set type to JSON
+        "Content-Type": "application/json",
       },
     })
   }
