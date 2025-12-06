@@ -6,9 +6,13 @@ import trashCan from "../images/trash.png"
 export default function GetAllMovies() {
   const [movieList, setMovieList] = useState([])
 
+  const prodUrl = import.meta.env.VITE_PRODUCTION_URL
+  const builtUrl = `${prodUrl}/items/`
+
+  // console.log("builtUrl all:", builtUrl)
+
   async function refreshMovies() {
-    // const response = await fetch("http://localhost:3000/items/")
-    const response = await fetch("http://107.216.101.56:3000/items/")
+    const response = await fetch(builtUrl)
     const data = await response.json()
 
     setMovieList(data.data)
@@ -33,7 +37,7 @@ export default function GetAllMovies() {
     console.log("delete use:", id)
 
     // await fetch(`http://localhost:3000/items/${id}`, {
-    await fetch(`http://107.216.101.56:3000/items/${id}`, {
+    await fetch(`http://${prodUrl}:3000/items/ ${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -4,6 +4,9 @@ export default function GameForm() {
   // let isTesting = false
   // isTesting = true
 
+  const prodUrl = import.meta.env.VITE_PRODUCTION_URL
+  const builtUrl = `${prodUrl}/items/`
+
   function handleForm(event) {
     event.preventDefault()
 
@@ -17,7 +20,7 @@ export default function GameForm() {
       imdb_id: imdbID,
     }
     console.log(movie)
-    fetch("http://localhost:3000/items/", {
+    fetch(builtUrl, {
       method: "POST", // set method
       body: JSON.stringify(movie), // set body of request (convert JSON to String)
       headers: {

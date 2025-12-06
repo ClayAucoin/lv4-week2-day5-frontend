@@ -17,11 +17,14 @@ function transformMovie(movieData) {
 export default function PokemonDisplay() {
   const [movie, setMovie] = useState(null)
 
+  const prodUrl = import.meta.env.VITE_PRODUCTION_URL
+  const staticMovie = import.meta.env.VITE_STATIC_MOVIE_ID
+  const builtUrl = `${prodUrl}/items/${staticMovie}`
+
+  // console.log("builtUrl single:", builtUrl)
+
   useEffect(() => {
-    // fetch("http://localhost:3000/items/53b053f0-2ad8-4072-8f34-0b9d65771d25")
-    fetch(
-      "http://107.216.101.56:3000/items/53b053f0-2ad8-4072-8f34-0b9d65771d25"
-    )
+    fetch(builtUrl)
       .then((response) => response.json())
       // .then((response) => console.log(response.data.title))
       .then(transformMovie)
