@@ -18,12 +18,12 @@ export default function GetMovie() {
   const [movie, setMovie] = useState(null)
   const [movieList, setMovieList] = useState([])
   const [actionLabel, setActionLabel] = useState("Add")
-  const [staticMovie, setStaticMovie] = useState(
-    "b60bdf71-3a42-4efc-bf93-b7a7bf62b99b"
-  )
   // const [staticMovie, setStaticMovie] = useState(
-  //   "461adc24-e05c-4b7f-ba8d-64075a533675"
+  //   "b60bdf71-3a42-4efc-bf93-b7a7bf62b99b"
   // )
+  const [staticMovie, setStaticMovie] = useState(
+    "461adc24-e05c-4b7f-ba8d-64075a533675"
+  )
   const [form, setForm] = useState({
     title: "",
     year: "",
