@@ -22,7 +22,7 @@ export default function GetMovie() {
   //   "b60bdf71-3a42-4efc-bf93-b7a7bf62b99b"
   // )
   const [staticMovie, setStaticMovie] = useState(
-    "461adc24-e05c-4b7f-ba8d-64075a533675"
+    "53b053f0-2ad8-4072-8f34-0b9d65771d25"
   )
   const [form, setForm] = useState({
     title: "",
@@ -202,14 +202,15 @@ export default function GetMovie() {
             >
               Edit Movie
             </button>
-            {movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" && (
-              <button
-                onClick={() => deleteMovie(movie.id)}
-                className="btn btn-primary m-1"
-              >
-                Delete Movie
-              </button>
-            )}
+            {movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" &&
+              movie.id != "53b053f0-2ad8-4072-8f34-0b9d65771d25" && (
+                <button
+                  onClick={() => deleteMovie(movie.id)}
+                  className="btn btn-primary m-1"
+                >
+                  Delete Movie
+                </button>
+              )}
           </div>
           <div className="w-75">
             <div className="d-flex mt-2 justify-content-between align-items-center">
@@ -306,14 +307,15 @@ export default function GetMovie() {
                   value={`${actionLabel} Movie`}
                 />
                 {actionLabel === "Add" ||
-                  (movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" && (
-                    <button
-                      onClick={() => deleteMovie(movie.id)}
-                      className="btn btn-primary m-1"
-                    >
-                      Delete Movie
-                    </button>
-                  ))}
+                  (movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" &&
+                    movie.id != "53b053f0-2ad8-4072-8f34-0b9d65771d25" && (
+                      <button
+                        onClick={() => deleteMovie(movie.id)}
+                        className="btn btn-primary m-1"
+                      >
+                        Delete Movie
+                      </button>
+                    ))}
               </div>
             </form>
           </div>
