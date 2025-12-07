@@ -7,3 +7,9 @@ img.icon {
 img.icon:hover {
   opacity: 0.5;
 }
+
+.fakeLink {
+  color: #546EFD;
+  text-decoration: underline;
+  cursor: pointer;
+}

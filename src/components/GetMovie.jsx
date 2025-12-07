@@ -18,6 +18,10 @@ function transformMovie(movieData) {
 export default function GetMovie() {
   const [movie, setMovie] = useState(null)
   const [movieList, setMovieList] = useState([])
+  const [actionLabel, setActionLabel] = useState("Add Movie")
+  const [staticMovie, setStaticMovie] = useState(
+    "461adc24-e05c-4b7f-ba8d-64075a533675"
+  )
   const [form, setForm] = useState({
     title: "",
     year: "",
@@ -30,11 +34,11 @@ export default function GetMovie() {
   const builtUrlAll = `${prodUrl}/items/`
 
   // build fetch url for SINGLE movie from env
-  const staticMovie = import.meta.env.VITE_STATIC_MOVIE_ID
+  // const staticMovie = import.meta.env.VITE_STATIC_MOVIE_ID
   const builtUrlSingle = `${builtUrlAll}${staticMovie}`
 
   // get all data for list
-  async function refreshMovies() {
+  async function refreshMovieList() {
     const response = await fetch(builtUrlAll)
     const data = await response.json()
 
@@ -43,25 +47,29 @@ export default function GetMovie() {
 
   useEffect(() => {
     function fetchMovies() {
-      refreshMovies()
+      refreshMovieList()
     }
     fetchMovies()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // get single movie
-  useEffect(() => {
-    fetch(builtUrlSingle)
+  async function getSingleMovie() {
+    await fetch(builtUrlSingle)
       .then((response) => response.json())
       .then(transformMovie)
       .then((movie) => setMovie(movie))
       .catch((error) => console.error("Error fetching:", error))
+  }
+
+  // get single movie
+  useEffect(() => {
+    getSingleMovie()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [staticMovie])
 
   // delete movie
   async function deleteMovie(id) {
-    console.log("delete use:", id)
+    // console.log("delete use:", id)
     const deleteUrl = `${builtUrlAll}${id}`
 
     await fetch(`${deleteUrl}`, {
@@ -70,11 +78,11 @@ export default function GetMovie() {
         "Content-Type": "application/json",
       },
     })
-    await refreshMovies()
+    await refreshMovieList()
   }
 
   async function addMovie(movie) {
-    console.log(movie)
+    // console.log(movie)
     fetch(builtUrlAll, {
       method: "POST",
       body: JSON.stringify(movie),
@@ -82,15 +90,37 @@ export default function GetMovie() {
         "Content-Type": "application/json",
       },
     })
-    // await refreshMovies()
   }
 
-  // async function updatemovie(id) {
-  //   console.log(id)
-  // }
+  async function updateMovie(movie) {
+    const updateUrl = `${builtUrlAll}${staticMovie}`
+    // console.log(updateUrl)
+    // console.log(movie)
+
+    fetch(updateUrl, {
+      method: "PUT",
+      body: JSON.stringify(movie),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    await refreshMovieList()
+  }
+
+  async function fillEditForm(id) {
+    // console.log(id)
+    setForm({
+      title: movie.title,
+      year: movie.year,
+      imdb_id: movie.imdb_id,
+    })
+    setActionLabel("Edit Movie")
+    setStaticMovie(id)
+  }
 
   async function handleForm(event) {
     event.preventDefault()
+    // console.log("actionLabel:", actionLabel)
 
     const ete = event.target.elements
 
@@ -103,23 +133,27 @@ export default function GetMovie() {
       year: movieYear,
       imdb_id: imdbID,
     }
-    console.log(movie)
-    await addMovie(movie)
-    // fetch(builtUrlAll, {
-    //   method: "POST",
-    //   body: JSON.stringify(movie),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
+    // console.log(movie)
 
-    setForm({ title: "", year: "", imdb_id: "" })
+    if (actionLabel === "Add Movie") {
+      await addMovie(movie)
+    }
+    if (actionLabel === "Edit Movie") {
+      await updateMovie(movie)
+    }
 
-    refreshMovies()
+    clearFields()
+
+    getSingleMovie()
+    refreshMovieList()
   }
 
   function updateField(fieldName, value) {
     setForm((f) => ({ ...f, [fieldName]: value }))
+  }
+
+  function clearFields() {
+    setForm({ title: "", year: "", imdb_id: "" })
   }
 
   if (!movie) {
@@ -144,28 +178,32 @@ export default function GetMovie() {
             <p>
               Genres: <b>{movie.genres}</b>
             </p>
+            {/* <p>{movie.id}</p> */}
+            <button
+              onClick={() => fillEditForm(movie.id)}
+              className="btn btn-primary"
+            >
+              Edit Movie
+            </button>
           </div>
 
           <h1 className="mt-2">All Movies</h1>
           <ul>
             {movieList.map((movie) => (
               <li key={movie.id}>
-                {movie.title} ({movie.year}){" "}
+                <a
+                  className="fakeLink"
+                  onClick={() => setStaticMovie(movie.id)}
+                >
+                  {movie.title} ({movie.year})
+                </a>{" "}
                 {movie.title != "Monkey Man" && (
-                  <>
-                    {/* <img
-                      src={edit}
-                      alt="Edit"
-                      className="icon"
-                      onClick={() => updatemovie(movie.id)}
-                    /> */}
-                    <img
-                      src={trashCan}
-                      alt="Delete"
-                      className="icon"
-                      onClick={() => deleteMovie(movie.id)}
-                    />
-                  </>
+                  <img
+                    src={trashCan}
+                    alt="Delete"
+                    className="icon"
+                    onClick={() => deleteMovie(movie.id)}
+                  />
                 )}
               </li>
             ))}
@@ -182,7 +220,8 @@ export default function GetMovie() {
             )}
           </div>
 
-          <h1 className="mt-4">Add Movie</h1>
+          <h1 className="mt-4">{actionLabel}</h1>
+          {/* {staticMovie} */}
           <div className="row">
             <form onSubmit={handleForm}>
               <div className="mb-1">
@@ -229,7 +268,7 @@ export default function GetMovie() {
                 <input
                   className="btn btn-primary"
                   type="submit"
-                  value="Add Movie"
+                  value={actionLabel}
                 />
               </div>
             </form>
