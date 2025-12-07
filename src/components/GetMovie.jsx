@@ -18,10 +18,14 @@ export default function PokemonDisplay() {
   const [movie, setMovie] = useState(null)
 
   // get path
-  const fullUrl = window.location.href
+  const fullUrl = window.location
   const urlObject = new URL(fullUrl)
   const path = urlObject.pathname
+  const hostname = urlObject.hostname
 
+  console.log("urlObject:", urlObject)
+  console.log(urlObject.href)
+  console.log("hostname:", hostname)
   console.log("path:", path)
 
   // const basePath = window.location.pathname
