@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import trashCan from "../images/trash.png"
-import edit from "../images/edit.jpg"
+// import edit from "../images/edit.jpg"
 
 function transformMovie(movieData) {
   return {
@@ -85,9 +85,9 @@ export default function GetMovie() {
     // await refreshMovies()
   }
 
-  async function updatemovie(id) {
-    console.log(id)
-  }
+  // async function updatemovie(id) {
+  //   console.log(id)
+  // }
 
   async function handleForm(event) {
     event.preventDefault()
@@ -135,90 +135,90 @@ export default function GetMovie() {
           <p>Year: {movie.year}</p>
           <p>IMDB ID: {movie.imdb_id}</p>
           <p>Genres: {movie.genres}</p>
+
+          <h1 className="mt-2">All Movies</h1>
+          <ul>
+            {movieList.map((movie) => (
+              <li key={movie.id}>
+                {movie.title} ({movie.year}){" "}
+                {movie.title != "Monkey Man" && (
+                  <>
+                    {/* <img
+                      src={edit}
+                      alt="Edit"
+                      className="icon"
+                      onClick={() => updatemovie(movie.id)}
+                    /> */}
+                    <img
+                      src={trashCan}
+                      alt="Delete"
+                      className="icon"
+                      onClick={() => deleteMovie(movie.id)}
+                    />
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="col">
           {movie.poster && (
             <img src={movie.poster} alt={movie.name} style={{ width: "50%" }} />
           )}
+
+          <h1 className="mt-4">Add Movie</h1>
+          <div className="row">
+            <form onSubmit={handleForm}>
+              <div className="mb-1">
+                <label className="form-label" htmlFor="movie_title">
+                  Movie Title
+                </label>
+                <input
+                  className="form-control form-control-sm"
+                  type="text"
+                  id="movie_title"
+                  name="movie_title"
+                  value={form.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div className="mb-1">
+                <label className="form-label" htmlFor="movie_year">
+                  Year
+                </label>
+                <input
+                  className="form-control form-control-sm"
+                  type="number"
+                  id="movie_year"
+                  name="movie_year"
+                  value={form.year}
+                  onChange={(e) => updateField("year", e.target.value)}
+                />
+              </div>
+              <div className="mb-1">
+                <label className="form-label" htmlFor="imdb_id">
+                  IMDB ID (tt1234567)
+                </label>
+                <input
+                  className="form-control form-control-sm"
+                  type="text"
+                  id="imdb_id"
+                  name="imdb_id"
+                  value={form.imdb_id}
+                  onChange={(e) => updateField("imdb_id", e.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="Add Movie"
+                />
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-
-      <h1>All Movies</h1>
-      <ul>
-        {movieList.map((movie) => (
-          <li key={movie.id}>
-            {movie.title} ({movie.year}){" "}
-            {movie.title != "Monkey Man" && (
-              <>
-                <img
-                  src={edit}
-                  alt="Edit"
-                  className="icon"
-                  onClick={() => updatemovie(movie.id)}
-                />
-                <img
-                  src={trashCan}
-                  alt="Delete"
-                  className="icon"
-                  onClick={() => deleteMovie(movie.id)}
-                />
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      <h1>Add/Edit Movie</h1>
-      <div className="row">
-        <form onSubmit={handleForm}>
-          <div className="mb-1">
-            <label className="form-label" htmlFor="movie_title">
-              Movie Title
-            </label>
-            <input
-              className="form-control form-control-sm"
-              type="text"
-              id="movie_title"
-              name="movie_title"
-              value={form.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              autoFocus
-            />
-          </div>
-          <div className="mb-1">
-            <label className="form-label" htmlFor="movie_year">
-              Year
-            </label>
-            <input
-              className="form-control form-control-sm"
-              type="number"
-              id="movie_year"
-              name="movie_year"
-              value={form.year}
-              onChange={(e) => updateField("year", e.target.value)}
-            />
-          </div>
-          <div className="mb-1">
-            <label className="form-label" htmlFor="imdb_id">
-              IMDB ID (tt1234567)
-            </label>
-            <input
-              className="form-control form-control-sm"
-              type="text"
-              id="imdb_id"
-              name="imdb_id"
-              value={form.imdb_id}
-              onChange={(e) => updateField("imdb_id", e.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              className="btn btn-primary"
-              type="submit"
-              value="Add Movie"
-            />
-          </div>
-        </form>
       </div>
     </>
   )
