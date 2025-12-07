@@ -84,7 +84,7 @@ export default function GetMovie() {
 
   async function addMovie(movie) {
     // console.log(movie)
-    fetch(builtUrlAll, {
+    await fetch(builtUrlAll, {
       method: "POST",
       body: JSON.stringify(movie),
       headers: {
