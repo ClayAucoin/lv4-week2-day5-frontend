@@ -1,11 +1,21 @@
 img.icon {
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 
 img.icon:hover {
   opacity: 0.5;
+}
+
+img.refresh {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+img.refresh:hover {
+  opacity: 0.8;
 }
 
 .fakeLink {

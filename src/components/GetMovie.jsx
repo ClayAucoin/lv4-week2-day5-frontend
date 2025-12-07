@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 // import trashCan from "../images/trash.png"
-// import refresh from "../images/refresh.png"
+import refresh from "../images/refresh.png"
 
 function transformMovie(movieData) {
   return {
@@ -186,7 +186,7 @@ export default function GetMovie() {
             >
               Edit Movie
             </button>
-            {movie.title != "Monkey Man" && (
+            {movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" && (
               <button
                 onClick={() => deleteMovie(movie.id)}
                 className="btn btn-primary m-1"
@@ -195,8 +195,18 @@ export default function GetMovie() {
               </button>
             )}
           </div>
+          <div className="w-75">
+            <div className="d-flex mt-2 justify-content-between align-items-center">
+              <h1>All Movies</h1>
+              <img
+                src={refresh}
+                alt="Delete"
+                className="refresh"
+                onClick={() => refreshMovieList()}
+              />
+            </div>
+          </div>
 
-          <h1 className="mt-2">All Movies</h1>
           <ul>
             {movieList.map((movie) => (
               <li key={movie.id}>
