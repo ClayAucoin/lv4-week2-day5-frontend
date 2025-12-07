@@ -1,7 +1,7 @@
 // src/components/GetMovie.jsx
 
 import { useState, useEffect } from "react"
-import trashCan from "../images/trash.png"
+// import trashCan from "../images/trash.png"
 // import edit from "../images/edit.jpg"
 
 function transformMovie(movieData) {
@@ -78,6 +78,7 @@ export default function GetMovie() {
         "Content-Type": "application/json",
       },
     })
+    setStaticMovie("461adc24-e05c-4b7f-ba8d-64075a533675")
     await refreshMovieList()
   }
 
@@ -181,9 +182,15 @@ export default function GetMovie() {
             {/* <p>{movie.id}</p> */}
             <button
               onClick={() => fillEditForm(movie.id)}
-              className="btn btn-primary"
+              className="btn btn-primary m-1"
             >
               Edit Movie
+            </button>
+            <button
+              onClick={() => deleteMovie(movie.id)}
+              className="btn btn-primary m-1"
+            >
+              Delete Movie
             </button>
           </div>
 
@@ -197,14 +204,14 @@ export default function GetMovie() {
                 >
                   {movie.title} ({movie.year})
                 </a>{" "}
-                {movie.title != "Monkey Man" && (
+                {/* {movie.title != "Monkey Man" && (
                   <img
                     src={trashCan}
                     alt="Delete"
                     className="icon"
                     onClick={() => deleteMovie(movie.id)}
                   />
-                )}
+                )} */}
               </li>
             ))}
           </ul>
