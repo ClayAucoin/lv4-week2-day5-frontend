@@ -1,26 +1,32 @@
 // src/components/GetMovie.jsx
 
-import { useState, useEffect } from "react"
-import refresh from "../images/refresh.png"
+import { useState, useEffect, useCallback } from "react"
+import MovieDetails from "./MovieDetails"
+import MovieList from "./MovieList"
+import MovieForm from "./MovieForm"
 
 function transformMovie(movieData) {
+  const data = movieData.data
   return {
-    id: movieData.data.id,
-    title: movieData.data.title,
-    year: movieData.data.year,
-    imdb_id: movieData.data.imdb_id,
-    genres: movieData.data.genres,
-    poster: movieData.data.poster,
+    id: data.id,
+    title: data.title,
+    year: data.year,
+    imdb_id: data.imdb_id,
+    genres: data.genres,
+    poster: data.poster,
   }
 }
+
+// ids that cannot be deleted
+const PROTECTED_IDS = new Set([
+  "461adc24-e05c-4b7f-ba8d-64075a533675",
+  "53b053f0-2ad8-4072-8f34-0b9d65771d25",
+])
 
 export default function GetMovie() {
   const [movie, setMovie] = useState(null)
   const [movieList, setMovieList] = useState([])
   const [actionLabel, setActionLabel] = useState("Add")
-  // const [staticMovie, setStaticMovie] = useState(
-  //   "b60bdf71-3a42-4efc-bf93-b7a7bf62b99b"
-  // )
   const [staticMovie, setStaticMovie] = useState(
     "53b053f0-2ad8-4072-8f34-0b9d65771d25"
   )
@@ -28,53 +34,49 @@ export default function GetMovie() {
     title: "",
     year: "",
     imdb_id: "",
-    // ...initialValues, // prefilled by edit mode
   })
 
-  // build fetch url for ALL movies from env
+  // build url from env
   const prodUrl = import.meta.env.VITE_PRODUCTION_URL
-  const builtUrlAll = `${prodUrl}/items/`
+  const baseUrl = `${prodUrl}/items/`
+  const staticUrl = `${baseUrl}${staticMovie}`
 
-  // build fetch url for SINGLE movie from env
-  // const staticMovie = import.meta.env.VITE_STATIC_MOVIE_ID
-  const builtUrlSingle = `${builtUrlAll}${staticMovie}`
+  const refreshMovieList = useCallback(async () => {
+    try {
+      const response = await fetch(baseUrl)
+      const data = await response.json()
 
-  // get all data for list
-  async function refreshMovieList() {
-    const response = await fetch(builtUrlAll)
-    const data = await response.json()
-
-    setMovieList(data.data)
-  }
+      setMovieList(data.data)
+    } catch (err) {
+      console.error("refresh error:", err)
+    }
+  }, [baseUrl])
 
   useEffect(() => {
-    function fetchMovies() {
-      refreshMovieList()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshMovieList()
+  }, [refreshMovieList])
+
+  const getSingleMovie = useCallback(async () => {
+    try {
+      await fetch(staticUrl)
+        .then((response) => response.json())
+        .then(transformMovie)
+        .then((movie) => setMovie(movie))
+        .catch((err) => console.error("fetching error:", err))
+    } catch (err) {
+      console.error("caught fetching error:", err)
     }
-    fetchMovies()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [staticUrl])
 
-  async function getSingleMovie() {
-    await fetch(builtUrlSingle)
-      .then((response) => response.json())
-      .then(transformMovie)
-      .then((movie) => setMovie(movie))
-      .catch((error) => console.error("Error fetching:", error))
-  }
-
-  // get single movie
   useEffect(() => {
     getSingleMovie()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [staticMovie])
+  }, [staticMovie, getSingleMovie])
 
-  // add movie
-  async function addMovie(movie) {
-    // console.log(movie)
-    await fetch(builtUrlAll, {
+  async function addMovie(moviePayload) {
+    await fetch(baseUrl, {
       method: "POST",
-      body: JSON.stringify(movie),
+      body: JSON.stringify(moviePayload),
       headers: {
         "Content-Type": "application/json",
       },
@@ -82,15 +84,10 @@ export default function GetMovie() {
     await refreshMovieList()
   }
 
-  // edit/update movie
-  async function updateMovie(movie) {
-    const updateUrl = `${builtUrlAll}${staticMovie}`
-    // console.log(updateUrl)
-    // console.log(movie)
-
-    fetch(updateUrl, {
+  async function updateMovie(moviePayload) {
+    await fetch(staticUrl, {
       method: "PUT",
-      body: JSON.stringify(movie),
+      body: JSON.stringify(moviePayload),
       headers: {
         "Content-Type": "application/json",
       },
@@ -99,12 +96,8 @@ export default function GetMovie() {
     await refreshMovieList()
   }
 
-  // delete movie
-  async function deleteMovie(id) {
-    // console.log("delete use:", id)
-    const deleteUrl = `${builtUrlAll}${id}`
-
-    await fetch(`${deleteUrl}`, {
+  async function deleteMovie() {
+    await fetch(staticUrl, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -114,8 +107,7 @@ export default function GetMovie() {
     await refreshMovieList()
   }
 
-  async function fillEditForm(id) {
-    // console.log(id)
+  function fillEditForm(id) {
     setForm({
       title: movie.title,
       year: movie.year,
@@ -127,30 +119,25 @@ export default function GetMovie() {
 
   async function handleForm(event) {
     event.preventDefault()
-    // console.log("actionLabel:", actionLabel)
-
     const ete = event.target.elements
-
     const movieTitle = ete.movie_title.value
     const movieYear = ete.movie_year.value
     const imdbID = ete.imdb_id.value
 
-    const movie = {
+    const moviePayload = {
       title: movieTitle,
       year: movieYear,
       imdb_id: imdbID,
     }
-    // console.log(movie)
 
     if (actionLabel === "Add") {
-      await addMovie(movie)
+      await addMovie(moviePayload)
     }
     if (actionLabel === "Edit") {
-      await updateMovie(movie)
+      await updateMovie(moviePayload)
     }
 
     clearFields()
-
     await getSingleMovie()
     await refreshMovieList()
   }
@@ -167,6 +154,7 @@ export default function GetMovie() {
 
   function clearFields() {
     setForm({ title: "", year: "", imdb_id: "" })
+    setActionLabel("Add")
   }
 
   function resetActionLabel() {
@@ -177,150 +165,37 @@ export default function GetMovie() {
     return <div>Loading...</div>
   }
 
+  const canDeleteCurrent = movie && !PROTECTED_IDS.has(movie.id)
+
   return (
-    <>
-      <div className="row">
-        <div className="col">
-          <h1>You Chose</h1>
-          <div className="ms-4">
-            <p>
-              Title: <b>{movie.title}</b>
-            </p>
-            <p>
-              Year: <b>{movie.year}</b>
-            </p>
-            <p>
-              IMDB ID: <b>{movie.imdb_id}</b>
-            </p>
-            <p>
-              Genres: <b>{movie.genres}</b>
-            </p>
-            {/* <p>{movie.id}</p> */}
-            <button
-              onClick={() => fillEditForm(movie.id)}
-              className="btn btn-primary m-1"
-            >
-              Edit Movie
-            </button>
-            {movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" &&
-              movie.id != "53b053f0-2ad8-4072-8f34-0b9d65771d25" && (
-                <button
-                  onClick={() => deleteMovie(movie.id)}
-                  className="btn btn-primary m-1"
-                >
-                  Delete Movie
-                </button>
-              )}
-          </div>
-          <div className="w-75">
-            <div className="d-flex mt-2 justify-content-between align-items-center">
-              <h1>All Movies</h1>
-              <img
-                src={refresh}
-                alt="Delete"
-                className="refresh"
-                onClick={() => refreshMovieList()}
-              />
-            </div>
-          </div>
+    <div className="row">
+      <div className="col">
+        <MovieDetails
+          movie={movie}
+          onEdit={() => fillEditForm(movie.id)}
+          onDelete={deleteMovie}
+          canDelete={canDeleteCurrent}
+        />
 
-          <ul>
-            {movieList.map((movie) => (
-              <li key={movie.id}>
-                <a
-                  className="fakeLink"
-                  onClick={() => changeStaticMovie(movie.id)}
-                >
-                  {movie.title} ({movie.year})
-                </a>{" "}
-                {/* {movie.title != "Monkey Man" && (
-                  <img
-                    src={trashCan}
-                    alt="Delete"
-                    className="icon"
-                    onClick={() => deleteMovie(movie.id)}
-                  />
-                )} */}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="col">
-          <div className="text-center">
-            {movie.poster && (
-              <img
-                src={movie.poster}
-                alt={movie.name}
-                style={{ width: "50%" }}
-              />
-            )}
-          </div>
-
-          <h1 className="mt-4">{actionLabel} Movie</h1>
-          {/* {staticMovie} */}
-          <div className="row">
-            <form onSubmit={handleForm}>
-              <div className="mb-1">
-                <label className="form-label" htmlFor="movie_title">
-                  Movie Title
-                </label>
-                <input
-                  className="form-control form-control-sm"
-                  type="text"
-                  id="movie_title"
-                  name="movie_title"
-                  value={form.title}
-                  onChange={(e) => updateField("title", e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <div className="mb-1">
-                <label className="form-label" htmlFor="movie_year">
-                  Year
-                </label>
-                <input
-                  className="form-control form-control-sm"
-                  type="number"
-                  id="movie_year"
-                  name="movie_year"
-                  value={form.year}
-                  onChange={(e) => updateField("year", e.target.value)}
-                />
-              </div>
-              <div className="mb-1">
-                <label className="form-label" htmlFor="imdb_id">
-                  IMDB ID (tt1234567)
-                </label>
-                <input
-                  className="form-control form-control-sm"
-                  type="text"
-                  id="imdb_id"
-                  name="imdb_id"
-                  value={form.imdb_id}
-                  onChange={(e) => updateField("imdb_id", e.target.value)}
-                />
-              </div>
-              <div>
-                <input
-                  className="btn btn-primary"
-                  type="submit"
-                  value={`${actionLabel} Movie`}
-                />
-                {actionLabel === "Add" ||
-                  (movie.id != "461adc24-e05c-4b7f-ba8d-64075a533675" &&
-                    movie.id != "53b053f0-2ad8-4072-8f34-0b9d65771d25" && (
-                      <button
-                        onClick={() => deleteMovie(movie.id)}
-                        className="btn btn-primary m-1"
-                      >
-                        Delete Movie
-                      </button>
-                    ))}
-              </div>
-            </form>
-          </div>
-        </div>
+        <MovieList
+          movieList={movieList}
+          onSelect={changeStaticMovie}
+          onRefresh={refreshMovieList}
+        />
       </div>
-    </>
+
+      <div className="col">
+        <MovieForm
+          movie={movie}
+          form={form}
+          actionLabel={actionLabel}
+          onChangeField={updateField}
+          onSubmit={handleForm}
+          onDelete={deleteMovie}
+          clearFields={clearFields}
+          canDelete={canDeleteCurrent && actionLabel !== "Add"}
+        />
+      </div>
+    </div>
   )
 }
