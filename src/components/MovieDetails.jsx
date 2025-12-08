@@ -1,5 +1,8 @@
 // src/components/MovieDetails.jsx
-export default function MovieDetails({ movie, onEdit, onDelete, canDelete }) {
+
+export default function MovieDetails(props) {
+  const { movie, onEdit, onDelete, canDelete } = props
+
   if (!movie) return null
 
   return (

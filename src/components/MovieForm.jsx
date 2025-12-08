@@ -1,15 +1,17 @@
 // src/components/MovieForm.jsx
 
-export default function MovieForm({
-  movie,
-  form,
-  actionLabel,
-  onChangeField,
-  onSubmit,
-  onDelete,
-  canDelete,
-  clearFields,
-}) {
+export default function MovieForm(props) {
+  const {
+    movie,
+    form,
+    actionLabel,
+    onChangeField,
+    onSubmit,
+    onDelete,
+    canDelete,
+    clearFields,
+  } = props
+
   return (
     <>
       <div className="text-center">

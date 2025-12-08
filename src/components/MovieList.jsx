@@ -1,7 +1,10 @@
 // src/components/MovieList.jsx
+
 import refresh from "../images/refresh.png"
 
-export default function MovieList({ movieList, onSelect, onRefresh }) {
+export default function MovieList(props) {
+  const { movieList, onSelect, onRefresh } = props
+
   return (
     <div className="w-75">
       <div className="d-flex mt-2 justify-content-between align-items-center">
