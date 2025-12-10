@@ -36,21 +36,30 @@ export default function GetMovie() {
     imdb_id: "",
   })
 
+  const apiKey = import.meta.env.VITE_MY_MOVIE_API_KEY
+
   // build url from env
-  const prodUrl = import.meta.env.VITE_PRODUCTION_URL
+  // const prodUrl = import.meta.env.VITE_PRODUCTION_URL
+  const prodUrl = import.meta.env.VITE_LOCALHOST_URL
   const baseUrl = `${prodUrl}/items/`
   const staticUrl = `${baseUrl}${staticMovie}`
 
   const refreshMovieList = useCallback(async () => {
     try {
-      const response = await fetch(baseUrl)
+      const response = await fetch(baseUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+      })
       const data = await response.json()
 
       setMovieList(data.data)
     } catch (err) {
       console.error("refresh error:", err)
     }
-  }, [baseUrl])
+  }, [baseUrl, apiKey])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -59,7 +68,11 @@ export default function GetMovie() {
 
   const getSingleMovie = useCallback(async () => {
     try {
-      await fetch(staticUrl)
+      await fetch(staticUrl, {
+        headers: {
+          "x-api-key": apiKey,
+        },
+      })
         .then((response) => response.json())
         .then(transformMovie)
         .then((movie) => setMovie(movie))
@@ -67,7 +80,7 @@ export default function GetMovie() {
     } catch (err) {
       console.error("caught fetching error:", err)
     }
-  }, [staticUrl])
+  }, [staticUrl, apiKey])
 
   useEffect(() => {
     getSingleMovie()
@@ -79,6 +92,7 @@ export default function GetMovie() {
       body: JSON.stringify(moviePayload),
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
       },
     })
     await refreshMovieList()
@@ -90,6 +104,7 @@ export default function GetMovie() {
       body: JSON.stringify(moviePayload),
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
       },
     })
     resetActionLabel()
@@ -101,6 +116,7 @@ export default function GetMovie() {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
       },
     })
     setStaticMovie("461adc24-e05c-4b7f-ba8d-64075a533675")
